@@ -60,7 +60,7 @@ public class ScriptSourceGenerator : IIncrementalGenerator
 
         var descendants = m_buildRenderTree.DescendantNodes().ToList();
         var invocations = descendants.OfType<InvocationExpressionSyntax>().ToList();
-        var scriptNodes = invocations.Where(q => q.Expression.ToString().Contains("OpenComponent<global::Blazor.LoveJS.Script<"));
+        var scriptNodes = invocations.Where(q => q.Expression.ToString().Contains("OpenComponent<global::Blazor.LoveJS.Script"));
 
         var result = new List<Script>();
         foreach (var script in scriptNodes)

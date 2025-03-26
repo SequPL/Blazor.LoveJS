@@ -2,32 +2,32 @@
 
 <div id="test" />
 
-<Script TComponent="Bundled" @ref=_scriptRef>
+<Script @ref=_scriptRef>
     export const run = (message) => {
             document.getElementById("test").innerText = message;
         }
 </Script>
 
-<Script TComponent="Bundled">
+<Script>
     export const run2 = (message) => {
             document.getElementById("test").innerText = message;
         }
 </Script>
 
-<Script TComponent="Bundled" GlobalBundle=true>
+<Script GlobalBundle=true>
     export const run3 = (message) => {
             document.getElementById("test").innerText = message;
         }
 </Script>
 
-<Script TComponent="Bundled" GlobalBundle=true>
+<Script GlobalBundle=true>
     export const run4 = (message) => {
             document.getElementById("test").innerText = message;
         }
 </Script>
 
 @code {
-    private Script<Bundled> _scriptRef = null!;
+    private Script _scriptRef = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

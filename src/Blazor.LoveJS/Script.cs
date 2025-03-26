@@ -1,10 +1,13 @@
 ﻿using Blazor.LoveJS.Common;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.JSInterop;
+using System.Runtime.CompilerServices;
 
 namespace Blazor.LoveJS;
 
-public class Script<TComponent> : IComponent, IHandleAfterRender, IAsyncDisposable
+public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
 {
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
@@ -41,11 +44,13 @@ public class Script<TComponent> : IComponent, IHandleAfterRender, IAsyncDisposab
     /// </summary>
     [Parameter] public ElementReference? HostRef { get; set; }
 
+    [Parameter] public string? ScriptFile { get; set; }
+
     // Injects:
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
     // State:
-    private static readonly Dictionary<string, IJSObjectReference> s_globalBundles = [];
+    private static readonly Dictionary<string, IJSObjectReference> s_globalScripts = [];
 
     private Lazy<Task<IJSObjectReference>> _moduleTask = null!;
 
@@ -53,10 +58,8 @@ public class Script<TComponent> : IComponent, IHandleAfterRender, IAsyncDisposab
     private bool _waitingForFirstRender = true;
     private bool _isInitialized;
 
-    private string _bundleName = null!;
-
     // Properties
-    public string ScriptFile { get; private set; } = null!;
+    public string LoadedScriptFile { get; private set; } = null!;
 
     // Methods:
     public virtual async ValueTask InvokeVoidAsync(string identifier, params object[] args)
@@ -77,18 +80,18 @@ public class Script<TComponent> : IComponent, IHandleAfterRender, IAsyncDisposab
 
         if (GlobalBundle)
         {
-            if (!s_globalBundles.TryGetValue(_bundleName, out module!))
+            if (!s_globalScripts.TryGetValue(LoadedScriptFile, out module!))
             {
-                module = await JS.InvokeAsync<IJSObjectReference>("import", ScriptFile)
-                    ?? throw new InvalidOperationException($"Failed to load script {ScriptFile}");
+                module = await JS.InvokeAsync<IJSObjectReference>("import", LoadedScriptFile)
+                    ?? throw new InvalidOperationException($"Failed to load script {LoadedScriptFile}");
 
-                s_globalBundles.Add(_bundleName, module);
+                s_globalScripts.Add(LoadedScriptFile, module);
             }
         }
         else
         {
-            module = await JS.InvokeAsync<IJSObjectReference>("import", ScriptFile)
-                ?? throw new InvalidOperationException($"Failed to load script {ScriptFile}");
+            module = await JS.InvokeAsync<IJSObjectReference>("import", LoadedScriptFile)
+                ?? throw new InvalidOperationException($"Failed to load script {LoadedScriptFile}");
         }
 
         if (OnInit is not null)
@@ -107,7 +110,7 @@ public class Script<TComponent> : IComponent, IHandleAfterRender, IAsyncDisposab
     }
 
     Task IComponent.SetParametersAsync(ParameterView parameters)
-    {            
+    {
         if (_isInitialized)
             throw new InvalidOperationException("The Script component has already been initialized - cannot change parameters after first init.");
         else
@@ -133,17 +136,29 @@ public class Script<TComponent> : IComponent, IHandleAfterRender, IAsyncDisposab
                     case nameof(HostRef):
                         HostRef = (ElementReference?)parameter.Value;
                         break;
+                    case nameof(ScriptFile):
+                        ScriptFile = (string?)parameter.Value;
+                        break;
                     default:
                         throw new InvalidOperationException($"Unknown parameter: {parameter.Name}");
                 }
             }
 
+            // get or add bundle 
+            if (ScriptFile is null)
+            {                
+                var bundleInfo = ComponentBundleInfoHelper.GetBundleInfo(parameters);
+                var bundleName = FilesUtils.GetJsFilename(GlobalBundle, BundleName, bundleInfo.BundleName);
+
+                LoadedScriptFile ??= $"./_content/{bundleInfo.PackageId}/{Consts.JS_OUTPUT}/{bundleName}.g.js";
+            }
+            else
+            {
+                LoadedScriptFile = ScriptFile;
+            }
+
+            // Init
             _moduleTask = new Lazy<Task<IJSObjectReference>>(LoadModuleAsync);
-            _bundleName = FilesUtils.GetJsFilename(GlobalBundle, BundleName, $"{typeof(TComponent).Namespace}.{typeof(TComponent).Name}");
-
-            ScriptFile ??= $"./_content/{typeof(TComponent).Assembly.GetName().Name}/{Consts.JS_OUTPUT}/{_bundleName}.g.js";
-
-            // Init render
             _renderHandle.Render((_) => { });
         }
 
