@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<!-- Important for LoveJS Generator to work -->
+		<UseRazorSourceGenerator>false</UseRazorSourceGenerator>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.2" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Blazor.LoveJS.Demo.Lib\Blazor.LoveJS.Demo.Lib.csproj" />
+		<ProjectReference Include="..\Blazor.LoveJS\Blazor.LoveJS.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Blazor.LoveJS.Generators\Blazor.LoveJS.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+</Project>

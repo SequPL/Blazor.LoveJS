@@ -40,10 +40,8 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
     [Parameter] public string? OnInit { get; set; }
 
     /// <summary>
-    /// Optional reference to the element, that will be passed to the OnInit fu.
+    /// In any case you need to pass custom ScriptFile ( not auto generated from ParentComponent ).
     /// </summary>
-    [Parameter] public ElementReference? HostRef { get; set; }
-
     [Parameter] public string? ScriptFile { get; set; }
 
     // Injects:
@@ -95,7 +93,7 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
         }
 
         if (OnInit is not null)
-            await module.InvokeVoidAsync(OnInit, HostRef);
+            await module.InvokeVoidAsync(OnInit);
 
         return module;
     }
@@ -133,9 +131,6 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
                     case nameof(OnInit):
                         OnInit = (string?)parameter.Value;
                         break;
-                    case nameof(HostRef):
-                        HostRef = (ElementReference?)parameter.Value;
-                        break;
                     case nameof(ScriptFile):
                         ScriptFile = (string?)parameter.Value;
                         break;
@@ -150,7 +145,7 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
                 var bundleInfo = ComponentBundleInfoHelper.GetBundleInfo(parameters);
                 var bundleName = FilesUtils.GetJsFilename(GlobalBundle, BundleName, bundleInfo.BundleName);
 
-                LoadedScriptFile ??= $"./_content/{bundleInfo.PackageId}/{Consts.JS_OUTPUT}/{bundleName}.g.js";
+                LoadedScriptFile = bundleInfo.IsFromLib ? $"./_content/{bundleInfo.PackageId}/{Consts.JS_OUTPUT}/{bundleName}.g.js" : $"./{Consts.JS_OUTPUT}/{bundleName}.g.js";
             }
             else
             {

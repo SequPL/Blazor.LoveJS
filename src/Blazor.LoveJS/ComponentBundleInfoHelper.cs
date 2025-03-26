@@ -2,26 +2,34 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.RenderTree;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Blazor.LoveJS;
 
-public readonly record struct ComponentBundleInfo(string PackageId, string BundleName)
+public readonly record struct ComponentBundleInfo(string PackageId, string BundleName, bool IsFromLib)
 {
     public string PackageId { get; } = PackageId;
     public string BundleName { get; } = BundleName;
+
+    public bool IsFromLib { get; } = IsFromLib;
 }
 
 public static class ComponentBundleInfoHelper
 {
     private static readonly Dictionary<Type, ComponentBundleInfo> s_componentBundles = [];
+    private static readonly Assembly s_entryAssembly = Assembly.GetEntryAssembly()!;
 
     public static ComponentBundleInfo GetBundleInfo(ParameterView parameters)
     {
         var parentComponentType = GetParentComponentType(parameters)!;
         if (!s_componentBundles.TryGetValue(parentComponentType, out ComponentBundleInfo componentBundle))
         {
-            componentBundle = new ComponentBundleInfo(parentComponentType.Assembly!.GetName()!.Name!, $"{parentComponentType.Namespace}.{parentComponentType.Name}");
+            // determine if the parent component is from a library or from the app
+            var parentComponentAssembly = parentComponentType.Assembly;
+            var isFromLib = parentComponentAssembly != s_entryAssembly;
+
+            componentBundle = new ComponentBundleInfo(parentComponentType.Assembly!.GetName()!.Name!, $"{parentComponentType.Namespace}.{parentComponentType.Name}", isFromLib);
             s_componentBundles.Add(parentComponentType, componentBundle);
         }
 

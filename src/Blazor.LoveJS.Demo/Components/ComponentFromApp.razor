@@ -1,0 +1,8 @@
+﻿<div id="result">waiting for prompt</div>
+
+<Script OnInit="promptMe">
+    export function promptMe() {
+        var result = prompt("Please enter your name", "Harry Potter");
+        document.getElementById("result").innerText = result;
+    }
+</Script>

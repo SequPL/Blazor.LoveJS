@@ -1,0 +1,23 @@
+﻿<div id="resultCDN">waiting for cdn</div>
+
+<Script OnInit="run">
+    export function run() {
+        // Load the package from CDN
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js';
+        script.onload = () => {
+            // Using anime.js to create a funny animation
+            anime({
+                targets: '#resultCDN',
+                translateX: 250,
+                rotate: '1turn',
+                backgroundColor: '#FFF',
+                duration: 2000,
+                complete: () => {
+                    document.getElementById("resultCDN").innerText = "Animation Complete!";
+                }
+            });
+        };
+        document.head.appendChild(script);
+    }
+</Script>
