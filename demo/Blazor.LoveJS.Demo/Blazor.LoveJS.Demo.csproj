@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
@@ -9,25 +9,17 @@
 		<UseRazorSourceGenerator>false</UseRazorSourceGenerator>
 	</PropertyGroup>
 
-
 	<ItemGroup>
-		<SupportedPlatform Include="browser" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.2" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.2" />
+		<ProjectReference Include="..\..\src\Blazor.LoveJS\Blazor.LoveJS.csproj" />
+		<ProjectReference Include="..\Blazor.LoveJS.Demo.Lib\Blazor.LoveJS.Demo.Lib.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Blazor.LoveJS\Blazor.LoveJS.csproj" />
-	</ItemGroup>
-
+	
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Blazor.LoveJS.Generators\Blazor.LoveJS.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="wwwroot\" />
-	</ItemGroup>
-
 </Project>
