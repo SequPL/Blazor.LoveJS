@@ -7,6 +7,8 @@ public class BundledCSharpTests : TestContext
     public void Should_Invoke_RunFunction()
     {
         // Arrange
+        JSInterop.SetupModule("./_content/Blazor.LoveJS.IntegrationTests/blazorLoveJS/index.g.js");
+
         var module = JSInterop.SetupModule("./_content/Blazor.LoveJS.IntegrationTests/blazorLoveJS/Blazor.LoveJS.IntegrationTests.Bundled.index.g.js")
                               .SetupVoid("run", "testMessage");
         
@@ -16,5 +18,4 @@ public class BundledCSharpTests : TestContext
         // Assert
         module.VerifyInvoke("run");
     }
-
 }

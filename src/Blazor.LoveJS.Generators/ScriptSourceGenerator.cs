@@ -14,19 +14,8 @@ public class ScriptSourceGenerator : IIncrementalGenerator
         public string Component { get; set; } = Component;
         public string Content { get; set; } = Content;
 
-        public bool AsModule { get; set; }
-
         public bool GlobalBundle { get; set; }
         public string? BundleName { get; set; }
-
-        public string? ScriptFile { get; set; }
-
-        public bool AsClass { get; set; }
-        public string? ClassName { get; set; }
-        public bool Export { get; set; }
-
-        public bool AddToGlobal { get; set; }
-        public bool AddAsInstance { get; set; }
     };
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -54,19 +43,17 @@ public class ScriptSourceGenerator : IIncrementalGenerator
         return node is MethodDeclarationSyntax method && method.Identifier.Text == "BuildRenderTree";
     }
 
-    private static Script? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
+    private static Script[] GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
     {
         // Hacky way to debug the generator
-        //#if DEBUG
-        //        if (!Debugger.IsAttached)
-        //        {
-        //            Debugger.Launch();
-        //        }
-        //#endif
+//#if DEBUG
+//        if (!System.Diagnostics.Debugger.IsAttached)
+//            System.Diagnostics.Debugger.Launch();
+//#endif
 
         var m_buildRenderTree = (MethodDeclarationSyntax)context.Node;
         var component = m_buildRenderTree.Ancestors().OfType<ClassDeclarationSyntax>().FirstOrDefault();
-        if (component == null) return null;
+        if (component == null) return [];
 
         var componentName = component.Identifier.Text;
         var componentNamespace = component.FirstAncestorOrSelf<NamespaceDeclarationSyntax>()?.Name.ToString();
@@ -75,6 +62,7 @@ public class ScriptSourceGenerator : IIncrementalGenerator
         var invocations = descendants.OfType<InvocationExpressionSyntax>().ToList();
         var scriptNodes = invocations.Where(q => q.Expression.ToString().Contains("OpenComponent<global::Blazor.LoveJS.Script<"));
 
+        var result = new List<Script>();
         foreach (var script in scriptNodes)
         {
             var openPosition = invocations.IndexOf(script);
@@ -88,40 +76,22 @@ public class ScriptSourceGenerator : IIncrementalGenerator
 
             if (childContentArg is not null)
             {
-                var markupContent = childContentArg.Token.ValueText;// ExtractMarkupContent(block);
+                var markupContent = childContentArg.Token.ValueText;
                 if (!string.IsNullOrWhiteSpace(markupContent))
                 {
                     var globalBundle = GetComponentParameter(ref invocations, openPosition, closePosition, "GlobalBundle", false);
                     var bundleName = GetComponentParameter(ref invocations, openPosition, closePosition, "BundleName", Consts.GLOBAL_INDEX);
 
-                    var scriptFile = GetComponentParameter(ref invocations, openPosition, closePosition, "ScriptFile", (string?)null);
-
-                    var asClass = GetComponentParameter(ref invocations, openPosition, closePosition, "AsClass", true);
-                    var className = GetComponentParameter(ref invocations, openPosition, closePosition, "ClassName", JSUtils.GetJsClassName(componentNamespace, componentName));
-                    var export = true;// GetComponentParameter(ref invocations, openPosition, closePosition, "Export", false);
-
-                    var addToGlobal = GetComponentParameter(ref invocations, openPosition, closePosition, "AddToGlobal", false);
-                    var addAsInstance = GetComponentParameter(ref invocations, openPosition, closePosition, "AddAsInstance", false);
-
-                    return new Script($"{componentNamespace}.{componentName}", markupContent!.Trim())
+                    result.Add(new Script($"{componentNamespace}.{componentName}", markupContent!.Trim())
                     {
                         GlobalBundle = globalBundle,
                         BundleName = bundleName,
-
-                        ScriptFile = scriptFile,
-
-                        AsClass = asClass,
-                        ClassName = className,
-                        Export = export,
-
-                        AddToGlobal = addToGlobal,
-                        AddAsInstance = addAsInstance
-                    };
+                    });
                 }
             }
         }
 
-        return null;
+        return [.. result];
     }
 
     private static T GetComponentParameter<T>(ref List<InvocationExpressionSyntax> invocations, int openPosition, int closePosition, string parameterName, T defaultValue)
@@ -150,7 +120,7 @@ public class ScriptSourceGenerator : IIncrementalGenerator
         return (T)Convert.ChangeType(argStr, typeof(T));
     }
 
-    private static void Execute(Compilation compilation, ImmutableArray<Script?> scripts, SourceProductionContext context, string projectPath)
+    private static void Execute(Compilation compilation, ImmutableArray<Script[]> scripts, SourceProductionContext context, string projectPath)
     {
         var outputPath = Path.Combine(projectPath, "wwwroot", Consts.JS_OUTPUT);
         if (!Directory.Exists(outputPath))
@@ -158,17 +128,15 @@ public class ScriptSourceGenerator : IIncrementalGenerator
 
         // Hacky way to debug the generator
         //#if DEBUG
-        //        if (!Debugger.IsAttached)
-        //        {
-        //            Debugger.Launch();
-        //        }
+        //        if (!System.Diagnostics.Debugger.IsAttached)
+        //            System.Diagnostics.Debugger.Launch();
         //#endif
-        var validScripts = scripts.Where(s => s != null).Cast<Script>();
+        var validScripts = scripts.Where(s => s != null).SelectMany(q => q);
         foreach (var bundle in validScripts.GroupBy(GetBundleName).Where(q => q.Any()))
             GenerateBundleFile(context, bundle, outputPath);
     }
 
-    private static string GetBundleName(Script script) => FilesUtils.GetJsFilename(script.GlobalBundle, script.BundleName, script.Component);
+    private static string GetBundleName(Script script) => FilesUtils.GetJsFilename(script.GlobalBundle, script.BundleName!, script.Component);
     //{
     //    if (script.GlobalBundle)
     //        return script.BundleName ?? "index";

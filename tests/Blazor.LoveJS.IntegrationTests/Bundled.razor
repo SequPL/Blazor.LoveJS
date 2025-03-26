@@ -8,6 +8,24 @@
         }
 </Script>
 
+<Script TComponent="Bundled">
+    export const run2 = (message) => {
+            document.getElementById("test").innerText = message;
+        }
+</Script>
+
+<Script TComponent="Bundled" GlobalBundle=true>
+    export const run3 = (message) => {
+            document.getElementById("test").innerText = message;
+        }
+</Script>
+
+<Script TComponent="Bundled" GlobalBundle=true>
+    export const run4 = (message) => {
+            document.getElementById("test").innerText = message;
+        }
+</Script>
+
 @code {
     private Script<Bundled> _scriptRef = null!;
 
