@@ -107,18 +107,39 @@ public class Script<TComponent> : IComponent, IHandleAfterRender, IAsyncDisposab
     }
 
     Task IComponent.SetParametersAsync(ParameterView parameters)
-    {
-        // TODO: Implement SetParametersAsync
-        parameters.SetParameterProperties(this);
-
+    {            
         if (_isInitialized)
             throw new InvalidOperationException("The Script component has already been initialized - cannot change parameters after first init.");
         else
         {
             _isInitialized = true;
 
+            foreach (var parameter in parameters)
+            {
+                switch (parameter.Name)
+                {
+                    case nameof(ChildContent):
+                        ChildContent = (RenderFragment?)parameter.Value;
+                        break;
+                    case nameof(GlobalBundle):
+                        GlobalBundle = (bool)parameter.Value;
+                        break;
+                    case nameof(BundleName):
+                        BundleName = (string?)parameter.Value;
+                        break;
+                    case nameof(OnInit):
+                        OnInit = (string?)parameter.Value;
+                        break;
+                    case nameof(HostRef):
+                        HostRef = (ElementReference?)parameter.Value;
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unknown parameter: {parameter.Name}");
+                }
+            }
+
             _moduleTask = new Lazy<Task<IJSObjectReference>>(LoadModuleAsync);
-            _bundleName = FilesUtils.GetJsFilename(GlobalBundle, BundleName, $"{typeof(TComponent).Namespace}.{typeof(TComponent).Name}");// GlobalBundle ? (BundleName ?? Consts.GLOBAL_INDEX) : $"{typeof(TComponent).Namespace}.{typeof(TComponent).Name}.{BundleName})";
+            _bundleName = FilesUtils.GetJsFilename(GlobalBundle, BundleName, $"{typeof(TComponent).Namespace}.{typeof(TComponent).Name}");
 
             ScriptFile ??= $"./_content/{typeof(TComponent).Assembly.GetName().Name}/{Consts.JS_OUTPUT}/{_bundleName}.g.js";
 
