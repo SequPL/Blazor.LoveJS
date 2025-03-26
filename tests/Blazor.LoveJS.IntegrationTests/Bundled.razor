@@ -2,10 +2,10 @@
 
 <div id="test" />
 
-<Script TComponent="Bundled" @ref=_scriptRef Export=true GlobalBundle=true>
-    run = (message) => {
-        document.getElementById("test").innerText = message;
-    }
+<Script TComponent="Bundled" @ref=_scriptRef>
+    export const run = (message) => {
+            document.getElementById("test").innerText = message;
+        }
 </Script>
 
 @code {

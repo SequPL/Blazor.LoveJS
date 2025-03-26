@@ -22,12 +22,18 @@
 	  <None Remove="bin\Debug\netstandard2.0\\Blazor.LoveJS.Generators.dll" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Include="..\Blazor.LoveJS.Common\Consts.cs" Link="Common\Consts.cs" />
+	  <Compile Include="..\Blazor.LoveJS.Common\FilesUtils.cs" Link="Common\FilesUtils.cs" />
+	  <Compile Include="..\Blazor.LoveJS.Common\JSUtils.cs" Link="Common\JSUtils.cs" />
+	</ItemGroup>
+
 	<!-- This ensures the library will be packaged as a source generator when we use `dotnet pack` -->
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Blazor.LoveJS.Common\Blazor.LoveJS.Common.csproj" />
+	  <Folder Include="Common\" />
 	</ItemGroup>
 	
 </Project>

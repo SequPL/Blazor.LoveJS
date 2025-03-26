@@ -7,7 +7,7 @@ using System.Text;
 namespace Blazor.LoveJS.Generators;
 
 [Generator]
-public class ScriptSourceGenerator2 : IIncrementalGenerator
+public class ScriptSourceGenerator : IIncrementalGenerator
 {
     private record Script(string Component, string Content)
     {
@@ -180,7 +180,7 @@ public class ScriptSourceGenerator2 : IIncrementalGenerator
     {
         var sb = new StringBuilder();
         foreach (var script in bundle)
-            sb.AppendLine(GenerateScriptContent(script));
+            sb.AppendLine(script.Content);
 
         var content = sb.ToString();
         if (!string.IsNullOrWhiteSpace(content))
@@ -191,40 +191,6 @@ public class ScriptSourceGenerator2 : IIncrementalGenerator
             File.WriteAllText(Path.Combine(outputPath, $"{bundle.Key}.g.js"), content);
         }
 
-    }
-
-    private static string GenerateScriptContent(Script script)
-    {
-        var sb = new StringBuilder();
-
-        if (script.AsClass)
-        {
-            if (script.Export)
-                sb.Append("export ");
-
-            sb.AppendLine($"class {script.ClassName}");
-            sb.AppendLine("{");
-            sb.AppendLine($"    {script.Content}");
-            sb.AppendLine("}");
-
-            if (script.AddToGlobal)
-            {
-                if (script.AddAsInstance)
-                {
-                    sb.AppendLine($"window.{script.ClassName} = new {script.ClassName}();");
-                }
-                else
-                {
-                    sb.AppendLine($"window.{script.ClassName} = {script.ClassName};");
-                }
-            }
-        }
-        else
-        {
-            sb.AppendLine(script.Content);
-        }
-
-        return sb.ToString();
     }
 }
 

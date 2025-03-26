@@ -6,11 +6,13 @@
 		<IsPackable>false</IsPackable>
 		<LangVersion>preview</LangVersion>
 
+		<!-- Important for LoveJS Generator to work -->
 		<UseRazorSourceGenerator>false</UseRazorSourceGenerator>
 
-
+		<!--
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<EmbedRazorGenerateSources>true</EmbedRazorGenerateSources>
+		-->
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -43,6 +45,10 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Blazor.LoveJS.Generators\Blazor.LoveJS.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\" />
 	</ItemGroup>
 
 </Project>
