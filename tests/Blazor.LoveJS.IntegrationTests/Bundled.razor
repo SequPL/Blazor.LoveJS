@@ -1,0 +1,23 @@
+@using Blazor.LoveJS;
+
+<div id="test" />
+
+<Script TComponent="Bundled" @ref=_scriptRef Export=true GlobalBundle=true>
+    run = (message) => {
+        document.getElementById("test").innerText = message;
+    }
+</Script>
+
+@code {
+    private Script<Bundled> _scriptRef = null!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await _scriptRef.InvokeVoidAsync("run", "testMessage");
+        }
+    }
+}

@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>true</ImplicitUsings>
+		<LangVersion>preview</LangVersion>
+
+
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+		<IsRoslynComponent>true</IsRoslynComponent>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="bin\Debug\netstandard2.0\\Blazor.LoveJS.Generators.dll" />
+	</ItemGroup>
+
+	<!-- This ensures the library will be packaged as a source generator when we use `dotnet pack` -->
+	<ItemGroup>
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Blazor.LoveJS.Common\Blazor.LoveJS.Common.csproj" />
+	</ItemGroup>
+	
+</Project>

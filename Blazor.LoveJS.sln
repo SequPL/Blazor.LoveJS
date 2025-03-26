@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.35821.62
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.LoveJS", "src\Blazor.LoveJS\Blazor.LoveJS.csproj", "{0F598310-4384-8088-494D-3F72E8460BB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.LoveJS.Generators", "src\Blazor.LoveJS.Generators\Blazor.LoveJS.Generators.csproj", "{DC74ED4D-B524-4940-8FC3-26B8950CAA70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.LoveJS.IntegrationTests", "tests\Blazor.LoveJS.IntegrationTests\Blazor.LoveJS.IntegrationTests.csproj", "{4C6B4B60-BEFE-4BA6-AE36-F830A5DA448F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.LoveJS.Common", "src\Blazor.LoveJS.Common\Blazor.LoveJS.Common.csproj", "{4453E3E4-A1F5-4843-96CC-43B66FAA5D0A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F598310-4384-8088-494D-3F72E8460BB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F598310-4384-8088-494D-3F72E8460BB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F598310-4384-8088-494D-3F72E8460BB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F598310-4384-8088-494D-3F72E8460BB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC74ED4D-B524-4940-8FC3-26B8950CAA70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC74ED4D-B524-4940-8FC3-26B8950CAA70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC74ED4D-B524-4940-8FC3-26B8950CAA70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC74ED4D-B524-4940-8FC3-26B8950CAA70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C6B4B60-BEFE-4BA6-AE36-F830A5DA448F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C6B4B60-BEFE-4BA6-AE36-F830A5DA448F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C6B4B60-BEFE-4BA6-AE36-F830A5DA448F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C6B4B60-BEFE-4BA6-AE36-F830A5DA448F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4453E3E4-A1F5-4843-96CC-43B66FAA5D0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4453E3E4-A1F5-4843-96CC-43B66FAA5D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4453E3E4-A1F5-4843-96CC-43B66FAA5D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4453E3E4-A1F5-4843-96CC-43B66FAA5D0A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {314C7DD7-7518-42EB-90E8-E63AF850055C}
+	EndGlobalSection
+EndGlobal
