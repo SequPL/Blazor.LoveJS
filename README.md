@@ -15,8 +15,8 @@ This approach keeps everything in one place, simplifying interactions and making
 <div id="test" />
 
 <Script @ref="_scriptRef">    
-    /* Functions have to be exported */
-    export const run = (message) => {
+    /* Function have to be exported */
+    export function run(message) => {
         document.getElementById("test").innerText = message;
     };
 </Script>
