@@ -6,22 +6,40 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>true</ImplicitUsings>
 		<LangVersion>preview</LangVersion>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 		<IsRoslynComponent>true</IsRoslynComponent>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Authors>m.august</Authors>
 		<Title>Blazor.LoveJS</Title>
 		<PackageProjectUrl>https://github.com/SequPL/Blazor.LoveJS</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/SequPL/Blazor.LoveJS</RepositoryUrl>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>		
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
+		<PackageReference Include="MinVer" Version="6.1.0-beta.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
+	<ItemGroup>
+		<Folder Include="Common\" />
+	</ItemGroup>
+	
 	<ItemGroup>
 	  <Compile Include="..\Blazor.LoveJS\Common\Consts.cs" Link="Common\Consts.cs" />
 	  <Compile Include="..\Blazor.LoveJS\Common\FilesUtils.cs" Link="Common\FilesUtils.cs" />
@@ -35,13 +53,6 @@
 	<!-- This ensures the library will be packaged as a source generator when we use `dotnet pack` -->
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-		<None Include="..\..\README.md">
-		  <Pack>True</Pack>
-		  <PackagePath>\</PackagePath>
-		</None>
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Common\" />
 	</ItemGroup>
 	
 </Project>

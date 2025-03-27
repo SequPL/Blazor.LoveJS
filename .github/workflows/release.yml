@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
     
+env:
+  NuGetDirectory: ${{ github.workspace}}/nuget
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,6 +14,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # Get all history to allow automatic versioning using MinVer
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v1
       with:
@@ -19,6 +24,13 @@ jobs:
       run: dotnet build -c Release
     - name: Test
       run: dotnet test -c Release --no-build
+    - uses: actions/upload-artifact@v3
+      with:
+        name: nuget
+        if-no-files-found: error
+        retention-days: 7
+        path: ${{ env.NuGetDirectory }}/*.nupkg
+
     - name: Pack nugets  
       run: |
         dotnet pack src/Blazor.LoveJS/Blazor.LoveJS.csproj -c Release --no-build --output .

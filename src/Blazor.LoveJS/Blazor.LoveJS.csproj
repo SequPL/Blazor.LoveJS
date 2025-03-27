@@ -4,19 +4,24 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+	
+	<PropertyGroup>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Authors>m.august</Authors>
+		<Title>Blazor.LoveJS</Title>
 		<PackageProjectUrl>https://github.com/SequPL/Blazor.LoveJS</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/SequPL/Blazor.LoveJS</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
-
+	
 	<ItemGroup>
-	  <None Include="..\..\README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
-
 
 	<ItemGroup>
 		<SupportedPlatform Include="browser" />
@@ -24,6 +29,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0" />
+		<PackageReference Include="MinVer" Version="6.1.0-beta.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 </Project>
