@@ -43,7 +43,6 @@
 	<ItemGroup>
 	  <Compile Include="..\Blazor.LoveJS\Common\Consts.cs" Link="Common\Consts.cs" />
 	  <Compile Include="..\Blazor.LoveJS\Common\FilesUtils.cs" Link="Common\FilesUtils.cs" />
-	  <Compile Include="..\Blazor.LoveJS\Common\JSUtils.cs" Link="Common\JSUtils.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
