@@ -4,21 +4,62 @@ using Microsoft.JSInterop;
 
 namespace Blazor.LoveJS;
 
+/// <summary>
+/// Represents a script component.
+/// <br/><br/>
+/// Example Usage:
+/// <code>
+/// @page "/example"
+/// @using Blazor.LoveJS;
+/// 
+/// &lt;div id="test" /&gt;
+/// 
+/// &lt;Script @ref="_scriptRef"&gt;    
+///     /* Functions have to be exported */
+///     export const run = (message) => {
+///         document.getElementById("test").innerText = message;
+///     };
+/// &lt;/Script>
+/// 
+/// @code {
+///     private Script _scriptRef = null!;
+/// 
+///     protected override async Task OnAfterRenderAsync(bool firstRender)
+///     {
+///         await base.OnAfterRenderAsync(firstRender);
+/// 
+///         if (firstRender)
+///         {
+///             await _scriptRef.InvokeVoidAsync("run", "testMessage");
+///         }
+///     }
+/// }
+/// </code>
+/// 
+/// <remarks>
+/// For larger components, it's still best to store JavaScript in separate files for better maintainability.
+/// </remarks>
+/// </summary>
 public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
 {
+    /// <summary>
+    /// JS Script
+    /// </summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
-    /// Use a global bundle for the script. If false the script will be generated depending on the type of <typeparamref name="TComponent"/>.
+    /// Use a global bundle for the script. If false the script will be generated depending on the type of Parent Component
     /// </summary>
     [Parameter] public bool GlobalBundle { get; set; } = false;
+
     /// <summary>
     /// The name of the bundle to use.
-    /// 
+    /// <br/><br/>
     /// If <see cref="GlobalBundle"/> is set to true, the bundle will be loaded from the path <c>"./_content/{packageId}/blazorLovejs/{BundleName}"</c>.
+    /// <br/>
     /// e.g. <c>"./_content/{packageId}/blazorLovejs/index.g.js"</c>
-    /// 
-    /// If <see cref="GlobalBundle"/> is set to false, the bundle will be loaded from the path <c>"./_content/{packageId}/blazorLovejs/{typeof(TComponent).Namespace}.{typeof(TComponent).Name}.{BundleName}.js"</c>.
+    /// <br/><br/>
+    /// If <see cref="GlobalBundle"/> is set to false, the bundle will be loaded from the path <c>"./_content/{packageId}/blazorLovejs/{&lt;ParentComponent&gt;.Namespace}.{&lt;ParentComponent&gt;.Name}.{BundleName}.js"</c>.
     /// </summary>
     [Parameter] public string? BundleName { get; set; } = "index";
 
@@ -35,7 +76,6 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
     /// </code>
     /// </summary>
     [Parameter] public string? OnInit { get; set; }
-
 
     /// <summary>
     /// The name of the function to call when the script is unloaded.
@@ -57,7 +97,7 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
     /// Note: This value is not used by the Generator.
     /// </summary>
     [Parameter] public string? ScriptFile { get; set; }
-    
+
     // Injects:
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
@@ -70,16 +110,29 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
     private bool _waitingForFirstRender = true;
     private bool _isInitialized;
 
-    // Properties
+    /// <summary>
+    /// Gets the file path of the loaded script.
+    /// </summary>
     public string LoadedScriptFile { get; private set; } = null!;
 
-    // Methods:
+    /// <summary>
+    /// Invokes a JavaScript function that does not return a value.
+    /// </summary>
+    /// <param name="identifier">The identifier of the JavaScript function to invoke.</param>
+    /// <param name="args">The arguments to pass to the JavaScript function.</param>
     public virtual async ValueTask InvokeVoidAsync(string identifier, params object[] args)
     {
         var module = await _moduleTask.Value;
         await module.InvokeVoidAsync(identifier, args);
     }
 
+    /// <summary>
+    /// Invokes a JavaScript function that returns a value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value returned by the JavaScript function.</typeparam>
+    /// <param name="identifier">The identifier of the JavaScript function to invoke.</param>
+    /// <param name="args">The arguments to pass to the JavaScript function.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the value returned by the JavaScript function.</returns>
     public virtual async ValueTask<TValue> InvokeAsync<TValue>(string identifier, params object[] args)
     {
         var module = await _moduleTask.Value;
@@ -156,7 +209,7 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
 
             // get or add bundle 
             if (ScriptFile is null)
-            {                
+            {
                 var bundleInfo = ComponentBundleInfoHelper.GetBundleInfo(parameters);
                 var bundleName = FilesUtils.GetJsFilename(GlobalBundle, BundleName, bundleInfo.BundleName);
 
@@ -184,6 +237,9 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Disposes the script component asynchronously.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (!GlobalBundle && _moduleTask is not null && _moduleTask.IsValueCreated)
