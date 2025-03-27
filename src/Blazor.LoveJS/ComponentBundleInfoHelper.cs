@@ -18,6 +18,8 @@ public readonly record struct ComponentBundleInfo(string PackageId, string Bundl
 public static class ComponentBundleInfoHelper
 {
     private static readonly Dictionary<Type, ComponentBundleInfo> s_componentBundles = [];
+    private static readonly Dictionary<Type, Type> s_componentTypeToBuildRenderTreeDeclaringType = [];
+
     private static readonly Assembly s_entryAssembly = Assembly.GetEntryAssembly()!;
 
     public static ComponentBundleInfo GetBundleInfo(ParameterView parameters)
@@ -35,6 +37,7 @@ public static class ComponentBundleInfoHelper
 
         return componentBundle;
     }
+
 #if UNSAFE_ACCESSORS
     private static Type GetParentComponentType(ParameterView parameters)
     {
@@ -42,12 +45,24 @@ public static class ComponentBundleInfoHelper
         int ownerIndex = OwnerIndexAccessor(ref parameters);
 
         if (frames is null || ownerIndex < 0 || ownerIndex >= frames.Length)
-            throw new InvalidOperationException("Failed to get parent component type.");
+            throw new InvalidOperationException("Unable to retrieve parent component type: Invalid frames or owner index.");
 
         var frame = frames[ownerIndex];
-        var componentState = ComponentStateAccessor(ref frame) ?? throw new InvalidOperationException("Failed to get parent component type.");
+        var componentState = ComponentStateAccessor(ref frame)
+            ?? throw new InvalidOperationException("Unable to retrieve parent component type: Component state is null.");
 
-        return componentState.ParentComponentState?.Component?.GetType() ?? throw new InvalidOperationException("Failed to get parent component type.");
+        var parentType = componentState.ParentComponentState?.Component?.GetType()
+            ?? throw new InvalidOperationException("Unable to retrieve parent component type: Parent component state or component type is null.");
+
+        if (!s_componentTypeToBuildRenderTreeDeclaringType.TryGetValue(parentType, out var dt))
+        {
+            dt = parentType.GetMethod("BuildRenderTree", BindingFlags.Instance | BindingFlags.NonPublic)?.DeclaringType
+                ?? throw new InvalidOperationException("Unable to retrieve parent component type: Failed to get declaring type of BuildRenderTree method.");
+
+            s_componentTypeToBuildRenderTreeDeclaringType.Add(parentType, dt);
+        }
+
+        return dt;
     }
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_frames")]
@@ -76,7 +91,14 @@ public static class ComponentBundleInfoHelper
         var componentStateField = frame.GetType().GetField("ComponentStateField", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var componentState = (ComponentState?)componentStateField?.GetValue(frame);
 
-        return componentState?.ParentComponentState?.Component.GetType() ?? throw new InvalidOperationException("Failed to get parent component type.");
+        var parentType  = componentState.ParentComponentState?.Component?.GetType() ?? throw new InvalidOperationException("Failed to get parent component type.");
+        if (!s_componentTypeToBuildRenderTreeDeclaringType.TryGetValue(parentType, out var dt))
+        {
+            dt = parentType.GetMethod("BuildRenderTree", BindingFlags.Instance | BindingFlags.NonPublic)?.DeclaringType ?? throw new InvalidOperationException("Failed to get parent component type.");
+            s_componentTypeToBuildRenderTreeDeclaringType.Add(parentType, dt);
+        }
+
+        return dt;
     }
 #endif
 }

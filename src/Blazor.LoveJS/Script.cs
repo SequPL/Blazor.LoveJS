@@ -1,9 +1,6 @@
 ﻿using Blazor.LoveJS.Common;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.JSInterop;
-using System.Runtime.CompilerServices;
 
 namespace Blazor.LoveJS;
 
@@ -32,18 +29,35 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
     /// <br />
     /// Example:
     /// <code>
-    /// export const run = (message) => {
-    ///     document.getElementById("test").innerText = message;
+    /// export const run = () => {
+    ///     document.getElementById("test").innerText = "init";
     /// }
     /// </code>
     /// </summary>
     [Parameter] public string? OnInit { get; set; }
 
+
     /// <summary>
-    /// In any case you need to pass custom ScriptFile ( not auto generated from ParentComponent ).
+    /// The name of the function to call when the script is unloaded.
+    /// 
+    /// Function have to be exported in the script.
+    /// <br />
+    /// Example:
+    /// <code>
+    /// export const unload = () => {
+    ///     document.getElementById("test").innerText = "unloaded";
+    /// }
+    /// </code>
+    /// </summary>
+    [Parameter] public string? OnUnload { get; set; }
+
+    /// <summary>
+    /// Specifies a custom file path for the script. If not set, the file path will be determined based on the values of <see cref="GlobalBundle"/> and <see cref="BundleName"/>.
+    /// <br/><br/>
+    /// Note: This value is not used by the Generator.
     /// </summary>
     [Parameter] public string? ScriptFile { get; set; }
-
+    
     // Injects:
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
@@ -109,9 +123,7 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
 
     Task IComponent.SetParametersAsync(ParameterView parameters)
     {
-        if (_isInitialized)
-            throw new InvalidOperationException("The Script component has already been initialized - cannot change parameters after first init.");
-        else
+        if (!_isInitialized)
         {
             _isInitialized = true;
 
@@ -133,6 +145,9 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
                         break;
                     case nameof(ScriptFile):
                         ScriptFile = (string?)parameter.Value;
+                        break;
+                    case nameof(OnUnload):
+                        OnUnload = (string?)parameter.Value;
                         break;
                     default:
                         throw new InvalidOperationException($"Unknown parameter: {parameter.Name}");
@@ -171,9 +186,13 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (!GlobalBundle && _moduleTask.IsValueCreated)
+        if (!GlobalBundle && _moduleTask is not null && _moduleTask.IsValueCreated)
         {
             var module = await _moduleTask.Value;
+
+            if (OnUnload is not null)
+                await module.InvokeVoidAsync(OnUnload);
+
             await module.DisposeAsync();
         }
 
