@@ -57,7 +57,7 @@ public static class ComponentBundleInfoHelper
         if (!s_componentTypeToBuildRenderTreeDeclaringType.TryGetValue(parentType, out var dt))
         {
             dt = parentType.GetMethod("BuildRenderTree", BindingFlags.Instance | BindingFlags.NonPublic)?.DeclaringType
-                ?? throw new InvalidOperationException("Unable to retrieve parent component type: Failed to get declaring type of BuildRenderTree method.");
+                ?? parentType;// throw new InvalidOperationException("Unable to retrieve parent component type: Failed to get declaring type of BuildRenderTree method.");
 
             s_componentTypeToBuildRenderTreeDeclaringType.Add(parentType, dt);
         }
