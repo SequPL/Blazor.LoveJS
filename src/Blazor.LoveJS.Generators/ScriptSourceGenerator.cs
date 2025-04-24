@@ -127,10 +127,10 @@ public class ScriptSourceGenerator : IIncrementalGenerator
             Directory.CreateDirectory(outputPath);
 
         // Hacky way to debug the generator
-        //#if DEBUG
-        //        if (!System.Diagnostics.Debugger.IsAttached)
-        //            System.Diagnostics.Debugger.Launch();
-        //#endif
+//#if DEBUG
+//        if (!System.Diagnostics.Debugger.IsAttached)
+//            System.Diagnostics.Debugger.Launch();
+//#endif
         var validScripts = scripts.Where(s => s != null).SelectMany(q => q);
         foreach (var bundle in validScripts.GroupBy(GetBundleName).Where(q => q.Any()))
             GenerateBundleFile(context, bundle, outputPath);
