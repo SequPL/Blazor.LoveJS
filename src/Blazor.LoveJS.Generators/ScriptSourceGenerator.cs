@@ -104,16 +104,6 @@ public class ScriptSourceGenerator : IIncrementalGenerator
         if (arg == null)
             return defaultValue;
 
-        //__builder.AddComponentParameter(3, "GlobalBundle", global::Microsoft.AspNetCore.Components.CompilerServices.RuntimeHelpers.TypeCheck<global::System.Boolean>(
-        //#nullable restore
-        //#line (5, 71) - (5, 75) "C:\D\Priv\GreyParrot.Reader\submodules\Blazor.LoveJS\tests\Blazor.LoveJS.IntegrationTests\Bundled.razor"
-        //true
-
-        //#line default
-        //#line hidden
-        //#nullable disable
-        //));
-
         var argNode = arg?.ArgumentList.Arguments[2];
         var argStr = argNode?.DescendantNodes().OfType<LiteralExpressionSyntax>().FirstOrDefault()?.Token.ValueText;
 
