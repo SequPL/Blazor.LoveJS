@@ -109,6 +109,7 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
     private RenderHandle _renderHandle;
     private bool _waitingForFirstRender = true;
     private bool _isInitialized;
+    private bool _disposed;
 
     /// <summary>
     /// Gets the file path of the loaded script.
@@ -242,6 +243,11 @@ public class Script : IComponent, IHandleAfterRender, IAsyncDisposable
     /// </summary>
     public async ValueTask DisposeAsync()
     {
+        if (_disposed)
+            return;
+
+        _disposed = true;
+
         if (!GlobalBundle && _moduleTask is not null && _moduleTask.IsValueCreated)
         {
             var module = await _moduleTask.Value;
